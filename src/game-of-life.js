@@ -1,4 +1,4 @@
-heArray.prototype.each = function(callback) {
+Array.prototype.each = function(callback) {
   var i = 0;
   while (i < this.length) {
     callback.call(this, this[i]);
@@ -63,7 +63,7 @@ World.prototype.tick = function() {
     if(currentCell.isLive()){
       if (liveNeighboursCount < 2) {
         affected.unshift(currentCell);
-      } else if(liveNeighboursCount > 5) {
+      } else if(liveNeighboursCount > 4) {
         affected.unshift(currentCell);
       }
     } else {
