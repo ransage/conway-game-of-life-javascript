@@ -1,4 +1,4 @@
-Array.prototype.each = function(callback) {
+heArray.prototype.each = function(callback) {
   var i = 0;
   while (i < this.length) {
     callback.call(this, this[i]);
@@ -37,11 +37,11 @@ Array.prototype.remove = function(element) {
   }
 };
 
-function World(width, heigth) {
+function World(width, height) {
   this.width = width;
-  this.heigth = heigth;
+  this.height = height;
 
-  var i = width * heigth;
+  var i = width * height;
   var x, y;
 
   this.cells = [];
@@ -63,11 +63,11 @@ World.prototype.tick = function() {
     if(currentCell.isLive()){
       if (liveNeighboursCount < 2) {
         affected.unshift(currentCell);
-      } else if(liveNeighboursCount > 3) {
+      } else if(liveNeighboursCount > 5) {
         affected.unshift(currentCell);
       }
     } else {
-      if(liveNeighboursCount == 3) {
+      if(liveNeighboursCount == 3 || liveNeighboursCount ==4) {
         affected.unshift(currentCell);
       }
     }
@@ -92,8 +92,8 @@ Cell.prototype.neighbours = function() {
   while(neighbourX <= this.x + 1) {
     realX = neighbourX;
     if(neighbourX == -1) {
-      realX = this.world.heigth - 1;
-    } else if(neighbourX == this.world.heigth) {
+      realX = this.world.height - 1;
+    } else if(neighbourX == this.world.height) {
       realX = 0;
     }
     neighbourY = this.y - 1;
