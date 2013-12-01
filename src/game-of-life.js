@@ -59,7 +59,7 @@ Array.prototype.remove = function(element) {
 };
 
 function World(numCols, numRows, ctx, squareDim) {
-    console.log('World constructor called')
+    //console.log('World constructor called')
   this.numCols = numCols;
   this.numRows = numRows;
   this.sq = squareDim;
@@ -94,9 +94,9 @@ World.prototype.toggle = function(mouseX, mouseY) {
     var col = Math.floor(mouseX / this.sq);
 
 
-    console.log('(row,col|live) before/after')
+    //console.log('(row,col|live) before/after')
     var liveNeighboursCount = this.countCellNeighbors(row, col);
-    console.log('(' + row + ','+col+'| '+liveNeighboursCount+')' );
+    //console.log('(' + row + ','+col+'| '+liveNeighboursCount+')' );
     //console.log('world toggle called (row,col): (' + row + ','+col+')' );
     if ( this.cells[row][col] ) {
         // Turn it off
@@ -109,12 +109,13 @@ World.prototype.toggle = function(mouseX, mouseY) {
         this.cells[row][col] = 1;
         this.turnOn(row,col);
     }
-    liveNeighboursCount = this.countCellNeighbors(row, col);
-    console.log('(' + row + ','+col+'| '+liveNeighboursCount+')' );
+    // After bug fix, no need to count twice
+    //liveNeighboursCount = this.countCellNeighbors(row, col);
+    //console.log('(' + row + ','+col+'| '+liveNeighboursCount+')' );
 }
 
 World.prototype.tick = function() {
-    console.log('tick called')
+    //console.log('tick called')
 
   for (var row = 0; row < this.numRows; row++) {
       //console.log('row and num rows: ' +row + ' and ' + this.numRows)
@@ -151,13 +152,14 @@ World.prototype.countCellNeighbors = function(row, col) {
 
     for( var rowInd = row-1; rowInd <= row+1; rowInd++ ){
         for( var colInd = col-1; colInd <= col+1; colInd++ ){
-
-// PUT BACK IN CONDITION FOR NOT COUNTING CELL ITSELF
+            if( rowInd != row || colInd != col) {
                 var rowOnInt = this.placeOnInterval(rowInd,this.numRows);
                 var colOnInt = this.placeOnInterval(colInd,this.numCols);
-                neighborCount += this.cells[rowOnInt][colOnInt];
-                //console.log('rowInd, colInd, count:' + rowOnInt + ', '+ colOnInt + ', '+ neighborCount);
-                
+                if(this.cells[rowOnInt][colOnInt]){
+                    neighborCount++;
+                } 
+                //console.log('rowInd, colInd, count: ' + rowOnInt + ', '+ colOnInt + ', '+ neighborCount);
+            }
         }
     }
     //console.log('row, col, count:' + row + ', '+ col + ', '+ neighborCount);
@@ -179,15 +181,15 @@ World.prototype.clear = function() {
 }
 
 World.prototype.turnOn = function(row, col) {
-    this.ctx.fillRect(col*this.sq, row*this.sq, this.sq-1, this.sq-1);
+    this.ctx.fillRect(col*this.sq, row*this.sq, this.sq, this.sq);
 }
 
 World.prototype.turnOff = function(row, col) {
-    this.ctx.clearRect(col*this.sq, row*this.sq, this.sq-1, this.sq-1);
+    this.ctx.clearRect(col*this.sq, row*this.sq, this.sq, this.sq);
 }
 
 World.prototype.render = function() {
-    console.log('render called')
+    //console.log('render called')
     this.clearAll();
     for (var row = 0; row < this.numRows; row++) {
         for (var col = 0; col < this.numCols; col++) {
@@ -199,7 +201,7 @@ World.prototype.render = function() {
 }
 
 World.prototype.randomize = function() {
-    console.log('randomize called')
+    //console.log('randomize called')
     this.ctx.clearRect ( 0 , 0 , this.numCols*this.sq , this.numRows*this.sq );
     for (var row = 0; row < this.numRows; row++) {
         for (var col = 0; col < this.numCols; col++) {

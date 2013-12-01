@@ -17,7 +17,7 @@
   </head>
 
   <body>
-    <canvas id="life_board" width="400" height="400">
+    <canvas id="life_board" width="800" height="800">
       This game/demo requires html5 canvas elements.  Sorry if it does not render...
     </canvas>
 
@@ -33,7 +33,7 @@
 
       var canvas = document.getElementById('life_board');
       var ctx = canvas.getContext('2d');
-      world = new World(10, 10, ctx, 40);
+      world = new World(100, 100, ctx, 8);
 
       canvas.addEventListener('click', globalToggle, false);
 
