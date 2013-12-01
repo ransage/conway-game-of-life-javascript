@@ -65,7 +65,7 @@ function World(numCols, numRows, ctx, squareDim) {
   this.sq = squareDim;
   this.ctx = ctx;
 
-    ctx.fillStyle = "rgb(255,255,120)";
+    ctx.fillStyle = "rgb(255,255,50)";
 
   var i = numCols * numRows;
   var x, y;
