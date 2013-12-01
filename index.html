@@ -22,7 +22,10 @@
     </canvas>
 
     <div id='game-of-life'></div>
-    <a href='#tick' id='ticker'>Tick</a> | <a href='#autoplay' id='autoplay'>Autoplay</a> | <a href='#randomize' id='randomize'>Randomize</a>
+    <a href='#tick' id='ticker'>Tick</a> | 
+    <a href='#autoplay' id='autoplay'>Autoplay</a> | 
+    <a href='#randomize' id='randomize'>Randomize</a> | 
+    <a href='#clear' id='clear'>Clear</a>
 
 
 <!--  pass canvas to class -->
@@ -30,8 +33,10 @@
 
       var canvas = document.getElementById('life_board');
       var ctx = canvas.getContext('2d');
-
       world = new World(10, 10, ctx, 40);
+
+      canvas.addEventListener('click', globalToggle, false);
+
       var autoplay = false;
 
       $('#ticker').click(function(event){
@@ -55,13 +60,19 @@
 
       $('#randomize').click(function(event){
         event.preventDefault();
-        autoplay = !autoplay;
         world.randomize();
-        world.render();
         autoplay = false;
       });
 
+      $('#clear').click(function(event){
+        event.preventDefault();
+        world.clear();
+        autoplay = false;
+      });
+
+
       $('#game-of-life').on('click', '.cell', function(){
+        console.log('toggle called - index.html')
         autoplay = false;
         var x = parseInt($(this).attr('data-x'));
         var y = parseInt($(this).attr('data-y'));
