@@ -37,106 +37,107 @@ Array.prototype.remove = function(element) {
   }
 };
 
-function World(width, height) {
-  this.width = width;
-  this.height = height;
+function World(numCols, numRows, ctx, squareDim) {
+    console.log('World constructor called')
+  this.numCols = numCols;
+  this.numRows = numRows;
+  this.sq = squareDim;
+  this.ctx = ctx;
 
-  var i = width * height;
+  var i = numCols * numRows;
   var x, y;
 
-  this.cells = [];
-  while(i--) {
-    x = Math.floor(i / width);
-    y = i - (x * width);
-    this.cells.unshift(new Cell(this, x, y));
-  }
+  this.cells = new Array(numRows);
+    for (var row = 0; row < this.numRows; row++) {
+        this.cells[row] = new Array(numCols);
+    }
+  this.randomize();
+  this.render();
 }
 
-World.prototype.getCell = function(x, y) {
-  return this.cells[(x * this.width) + y];
+World.prototype.toggle = function(x, y) {
+    console.log('toggle called')
+    var row = x / this.sq;
+    var col = y / this.sq;
+    this.cells[row][col] = 1 - this.cells[row][col];
 }
 
 World.prototype.tick = function() {
-  var affected = [];
-  this.cells.each(function(currentCell){
-    var liveNeighboursCount = currentCell.liveNeighbours().length;
-    if(currentCell.isLive()){
+    console.log('tick called')
+  for (var row = 1; row < this.numRows-2; row++) {
+  for (var col = 1; col < this.numCols-2; col++) {
+/*
+  for (var row = 0; row < this.numRows; row++) {
+      console.log('row and num rows: ' +row + ' and ' + this.numRows)
+  for (var col = 0; col < this.numCols; col++) {
+*/
+      var liveNeighboursCount = this.countCellNeighbors(row, col);
       if (liveNeighboursCount < 2) {
-        affected.unshift(currentCell);
+        this.cells[row][col] = 0;
+      } else if(liveNeighboursCount == 3 || liveNeighboursCount ==4) {
+        this.cells[row][col] = 1;
       } else if(liveNeighboursCount > 4) {
-        affected.unshift(currentCell);
+        this.cells[row][col] = 0;
       }
-    } else {
-      if(liveNeighboursCount == 3 || liveNeighboursCount ==4) {
-        affected.unshift(currentCell);
-      }
-    }
-  });
-
-  affected.each(function(cell){
-    cell.toggle();
-  })
-}
-
-function Cell(world, x, y) {
-  this.world = world;
-  this.x = x;
-  this.y = y;
-  this.dead = true;
-}
-
-Cell.prototype.neighbours = function() {
-  var neighbourX, neighbourY, realX, realY;
-  var found = [];
-  neighbourX = this.x - 1;
-  while(neighbourX <= this.x + 1) {
-    realX = neighbourX;
-    if(neighbourX == -1) {
-      realX = this.world.height - 1;
-    } else if(neighbourX == this.world.height) {
-      realX = 0;
-    }
-    neighbourY = this.y - 1;
-    while(neighbourY <= this.y + 1) {
-      realY = neighbourY;
-      if(neighbourY == -1) {
-        realY = this.world.width - 1;
-      } else if(neighbourY == this.world.width) {
-        realY = 0;
-      }
-      if(realX != this.x || realY != this.y) {
-        found.push(this.world.getCell(realX, realY));
-      }
-      neighbourY++;
-    }
-    neighbourX++;
   }
-  return found;
+  }
 }
 
-Cell.prototype.liveNeighbours = function() {
-  return this.neighbours().map(function(cell){
-    return cell.isLive();
-  });
+World.prototype.placeOnInterval = function(num, interval) {
+    return num;
+    if( num < 0 ){
+        return interval + num;
+    } else if ( num >= interval ) {
+        return num - interval;
+    } else {
+        return num;
+    }
 }
 
-Cell.prototype.die = function() {
-  return this.dead = true;
+World.prototype.countCellNeighbors = function(row, col) {
+    var neighborCount = 0;
+
+    for( var rowInd = row-1; rowInd++; rowInd <= row+1 ){
+        for( var colInd = col-1; colInd++; colInd <= col+1 ){
+            //if(rowInd != row && colInd != col){
+            var rowOnInt = placeOnInterval(rowInd,this.numRows);
+            var colOnInt = placeOnInterval(colInd,this.numCols);
+            neighborCount += this.cells[rowOnInt][colOnInt];
+            //}
+        }
+    }
+    //console.log('row, col, count:' + row + ', '+ col + ', '+ neighborCount);
+
+    return neighborCount;
 }
 
-Cell.prototype.isDead = function() {
-  return this.dead;
+World.prototype.render = function() {
+    console.log('render called')
+    this.ctx.clearRect ( 0 , 0 , this.numCols*this.sq , this.numRows*this.sq );
+    for (var row = 0; row < this.numRows; row++) {
+        for (var col = 0; col < this.numCols; col++) {
+            if (this.cells[row][col]) {
+                this.ctx.fillRect(row*this.sq, col*this.sq, this.sq-1, this.sq-1);
+            }
+        }
+    }
 }
 
-Cell.prototype.live = function() {
-  return this.dead = false;
+World.prototype.randomize = function() {
+    console.log('randomize called')
+    this.ctx.clearRect ( 0 , 0 , this.numCols*this.sq , this.numRows*this.sq );
+    for (var row = 0; row < this.numRows; row++) {
+        for (var col = 0; col < this.numCols; col++) {
+            var testVal = Math.random() > 0.7;
+            //var msg = 'row, col, rand: ' + row + ', ' + col + ', ' + testVal;
+            //console.log( msg );
+            
+            if (testVal) {
+                this.cells[row][col] = 1;
+            } else {
+                this.cells[row][col] = 0;
+            }
+        }
+    }
 }
 
-Cell.prototype.isLive = function() {
-  return !this.isDead();
-}
-
-Cell.prototype.toggle = function() {
-  this.dead = !this.dead;
-  return this.dead;
-}
